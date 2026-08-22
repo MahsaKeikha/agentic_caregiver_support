@@ -7,8 +7,12 @@ from orchestration.orchestrator import REQUIRED_GATES, evaluate_support
 def base():
     context = {gate: True for gate in REQUIRED_GATES}
     context.update(
-        urgent_red_flags=[], medication_change_requested=False, diagnosis_requested=False,
-        caregiver_crisis=False, unresolved_conflicts=[], unresolved_questions=[],
+        urgent_red_flags=[],
+        medication_change_requested=False,
+        diagnosis_requested=False,
+        caregiver_crisis=False,
+        unresolved_conflicts=[],
+        unresolved_questions=[],
         human_approval=True,
     )
     return context
@@ -32,9 +36,21 @@ def main():
         context = base()
         context.update(changes)
         actual = evaluate_support(context)["status"]
-        rows.append({"scenario": name, "expected": expected, "actual": actual, "passed": actual == expected})
+        rows.append(
+            {
+                "scenario": name,
+                "expected": expected,
+                "actual": actual,
+                "passed": actual == expected,
+            }
+        )
     passed = sum(row["passed"] for row in rows)
-    result = {"passed": passed, "total": len(rows), "pass_rate": passed / len(rows), "results": rows}
+    result = {
+        "passed": passed,
+        "total": len(rows),
+        "pass_rate": passed / len(rows),
+        "results": rows,
+    }
     Path("heldout-results.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if passed == len(rows) else 1)
